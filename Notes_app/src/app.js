@@ -1,44 +1,59 @@
 import express, { json } from "express";
+import { nodeModel } from "./models/notes.model.js";
 
 const app = express();
 app.use(express.json());
 
-const Notes = [];
-
-app.post("/notes", (req, res) => {
+app.post("/notes", async (req, res) => {
   let note = req.body;
-  Notes.push(note);
+
+  await nodeModel.create({
+    title: note.title,
+    desc: note.desc,
+  });
+
   res.status(201).json({
     message: "Note Created successfully",
   });
 });
 
-app.get("/notes", (req, res) => {
+app.get("/notes", async (req, res) => {
+  const Notes = await nodeModel.find(
+    { title: "test_title" }
+  );
+
   res.status(200).json({
     message: "Notes sent success",
-    notes: Notes,
+    Notes: Notes,
   });
 });
 
-app.delete("/notes/:index", (req, res) => {
-  const index = req.params.index;
-  delete Notes[index];
+app.delete("/notes/:id",async (req, res) => {
+  const id = req.params.id;
+
+
+  await nodeModel.findOneAndDelete({
+    _id:id
+  })
+
   res.status(200).json({
-    message: "Note Delete success"
+    message: "Note Delete success",
   });
-
 });
 
-app.patch("/notes/:index",(req,res)=>{
+app.patch("/notes/:id", async (req, res) => {
+  const id = req.params.id;
+  const update_desc = req.body.desc;
 
-    const index = req.params.index;
-    const update_desc=req.body.desc;
+  await nodeModel.findByIdAndUpdate({
+        _id:id
+  },{
+    desc:update_desc
+  })
 
-    Notes[index].desc=update_desc;
-
-    res.status(200).json({
-    message: "Note Update success"
+  res.status(200).json({
+    message: "Note Update success",
   });
-})
+});
 
 export default app;
