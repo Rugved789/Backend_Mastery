@@ -2,16 +2,17 @@ import express from "express";
 import multer from "multer";
 import uploadfile from "./services/storage.service.js";
 import { blogModel } from "./models/blog.model.js";
-
+import cors from "cors";
 
 export const app = express();
+// enable CORS middleware (remember the function call)
+app.use(cors());
 app.use(express.json());
-const upload = multer({storage:multer.memoryStorage()})
+const upload = multer({storage:multer.memoryStorage()});
 
 
 app.post("/create-blog",upload.single("image"), async (req,res)=>{
-    console.log(req.body);
-    console.log(req.file)
+
 
     const result = await uploadfile(req.file.buffer);
     
